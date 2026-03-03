@@ -5,11 +5,11 @@ from io import StringIO
 
 """Convierte el texto CSV en un DataFrame de pandas, asegurando que 'importe' sea numérico."""
 
-def csv_a_dataframe(list_csv):
+def csv_a_dataframe(list_csv: list[str])-> pd.DataFrame:
 
     if not list_csv:
         print("No se encontró ningún contenido para convertir a dataframe.")
-        return []
+        return pd.DataFrame
 
     # Definir los tipos de datos para cada columna
     dtype_cols = {
@@ -58,5 +58,7 @@ def csv_a_dataframe(list_csv):
     df['dia_factura'] = df['fecha_factura'].dt.day
     df['mes_factura'] = df["fecha_factura"].dt.month
     df['ano_factura'] = df['fecha_factura'].dt.year
+
+    print('Conversión a dataframe finalizó')
 
     return df

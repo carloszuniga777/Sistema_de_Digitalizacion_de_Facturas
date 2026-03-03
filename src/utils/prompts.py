@@ -54,13 +54,18 @@ No agregues explicaciones ni comentarios.
     ✅ Mantén letras y números.
 
 3. concepto
-    ✅ Extrae la descripción principal del producto o servicio.
-    ✅ Si hay múltiples líneas de detalle:
-        1. Selecciona la más representativa del total facturado.
-
-    ✅ Elimina saltos de línea.
-    ✅ Reemplaza punto y coma (;) por coma (,).
-    ✅ No uses comillas.
+    ✅ Haz un resumen compacto de los productos o servicios de la factura.
+    ✅ Agrupa productos similares o iguales en uno solo con su cantidad total.
+    ✅ Abrevia las descripciones eliminando palabras innecesarias, conservando lo esencial: marca, modelo, medida o característica clave.
+    ✅ Concatena cada item resumido separado por pipe (|).
+    ✅ Formato: producto1 xN | producto2 xN
+    ✅ Ejemplos:
+        "Arroz premium 50 lb | Frijoles rojos 25 lb | Sal refinada 25 lb" → Arroz 50lb | Frijoles 25lb | Sal 25lb
+        "1306000051 Impresora Multifuncional Epson L3250 1x (x3 veces)" → Epson L3250 x3
+        "Amoxicilina 500mg caja x100 cap | Ibuprofeno 400mg caja x100 tab" → Amoxicilina 500mg x1 | Ibuprofeno 400mg x1
+    ✅ No incluyas precios, subtotales ni códigos de producto.
+    ✅ Elimina saltos de línea y comillas.
+    ✅ Si algún texto contiene pipe (|), reemplázalo por coma (,).
 
 4. Monto Total
     ✅ Extrae exclusivamente el TOTAL FINAL A PAGAR.

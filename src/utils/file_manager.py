@@ -1,6 +1,6 @@
 import os
 
-def obtener_facturas():
+def obtener_facturas() -> list[str]:
     facturas = []
     carpeta_factura = "./facturas"
     contenido = os.listdir(carpeta_factura)
