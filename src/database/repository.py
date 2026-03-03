@@ -1,126 +1,123 @@
-
 import sqlite3
 from pathlib import Path
 from datetime import date
 import pandas as pd
+import logging
 
-# ✅ Robusto - siempre apunta al mismo lugar sin importar desde dónde ejecutas
+# Configuración de logging en lugar de print
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+
 SQLITE_DB = Path(__file__).parent / "facturas.db"
 
 
-def cargar_sql(df: pd.DataFrame) -> None:
 
+# Definición de la tabla 
+CREATE_TABLE_SQL = '''
+    CREATE TABLE IF NOT EXISTS tbl_facturas (
+        fecha_carga          TEXT,
+        fecha_factura        TEXT,
+        dia_factura          TEXT,
+        mes_factura          TEXT,
+        ano_factura          TEXT,
+        numero_factura       TEXT,
+        proveedor            TEXT,
+        rtn_proveedor        TEXT,
+        direccion_proveedor  TEXT,
+        telefono_proveedor   TEXT,
+        pais_proveedor       TEXT,
+        nombre_cliente       TEXT,
+        rtn_cliente          TEXT,
+        concepto             TEXT,
+        monto_total          REAL,
+        moneda               TEXT,
+        monto_total_lempiras REAL,
+        tipo_factura         TEXT
+    )
+'''
+
+
+
+
+
+def cargar_sql(df: pd.DataFrame) -> bool:
+    """
+    Carga un DataFrame en la tabla tbl_facturas, reemplazando los registros del año actual.
+    Retorna True si la operación fue exitosa, False en caso contrario.
+    """
     if df.empty:
-        print("Advertencia: El DataFrame está vacío. No hay datos para insertar.")
-        return
+        logging.warning("⚠️ El DataFrame está vacío. No hay datos para insertar.")
+        return False
+
+
+    # Validación opcional: que el DataFrame tenga las columnas esperadas
+    expected_columns = [
+        'fecha_carga', 
+        'fecha_factura', 
+        'dia_factura', 
+        'mes_factura', 
+        'ano_factura',
+        'numero_factura', 
+        'proveedor', 
+        'rtn_proveedor', 
+        'direccion_proveedor',
+        'telefono_proveedor', 
+        'pais_proveedor', 
+        'nombre_cliente', 
+        'rtn_cliente',
+        'concepto', 
+        'monto_total', 
+        'moneda', 
+        'monto_total_lempiras', 
+        'tipo_factura'
+    ]
+
+    # Valida que las columnas del dataframe sean las correctas 
+    if not all(col in df.columns for col in expected_columns):
+        logging.error("❌ El DataFrame no contiene todas las columnas requeridas.")
+        return False
+
+    # Se obtiene el año actual
+    ano_actual = str(date.today().year)
 
     try:
         with sqlite3.connect(SQLITE_DB, timeout=30) as conn:
+            
+            # Crear tabla si no existe 
+            conn.execute(CREATE_TABLE_SQL)
 
-            conn.execute('''
-                CREATE TABLE IF NOT EXISTS tbl_facturas(
-                    fecha_carga          text,
-                    fecha_factura        text,
-                    dia_factura          text,
-                    mes_factura          text,
-                    ano_factura          text,
-                    numero_factura       text, 
-                    proveedor            text, 
-                    rtn_proveedor        text, 
-                    direccion_proveedor  text, 
-                    telefono_proveedor   text, 
-                    pais_proveedor       text, 
-                    nombre_cliente       text, 
-                    rtn_cliente          text, 
-                    concepto             text, 
-                    monto_total          real, 
-                    moneda               text, 
-                    monto_total_lempiras real,
-                    tipo_factura         text
-                )
-            ''')
+            # Iniciar transacción con bloqueo IMMEDIATE (previene escrituras concurrentes)
+            conn.execute('BEGIN IMMEDIATE')
 
-            ano_actual = str(date.today().year)
-
+            # Borrar las facturas de año actual
             conn.execute(
                 "DELETE FROM tbl_facturas WHERE ano_factura = ?",
                 (ano_actual,)
             )
 
+            # Insertar nuevos datos
             df.to_sql(
                 "tbl_facturas",
                 conn,
                 if_exists="append",
-                index=False
+                index=False,
+                method="multi"      # Para inserts por lotes (mejor rendimiento con muchos datos)
             )
 
-            print("Datos insertados correctamente")
-            print("Proceso completado exitosamente.")
 
+            # Confirmar transacción
+            conn.commit()
+            
+            logging.info("✅ Datos insertados a la base de datos correctamente para el año %s", ano_actual)
+            
+            return True
+
+    except sqlite3.OperationalError as e:
+        logging.error("❌ Error de base de datos (posible bloqueo o sintaxis): %s", e)
+        # No es necesario rollback explícito, el context manager lo hará al salir
+        return False
+    
     except Exception as e:
-        print(f"Error en la creación e inserción en SQLITE: {str(e)}")
-
-        
-
-# def cargar_sql(df):
-    
-#      # Validacion si dataframe viene vacio
-#     if df.empty:
-#         print("Advertencia: El DataFrame está vacío. No hay datos para insertar.")
-#         return 
-
-#     try:
-#         with sqlite3.connect(SQLITE_DB, timeout=30) as conn:
-            
-#             conn.execute('BEGIN EXCLUSIVE')
-    
-#             # Creacion de tabla
-#             conn.execute('''
-#                 CREATE TABLE IF NOT EXISTS tbl_facturas(
-#                     fecha_carga          text,
-#                     fecha_factura        text,
-#                     dia_factura          text,
-#                     mes_factura          text,
-#                     ano_factura          text,
-#                     numero_factura       text, 
-#                     proveedor            text, 
-#                     rtn_proveedor        text, 
-#                     direccion_proveedor  text, 
-#                     telefono_proveedor   text, 
-#                     pais_proveedor       text, 
-#                     nombre_cliente       text, 
-#                     rtn_cliente          text, 
-#                     concepto             text, 
-#                     monto_total          real, 
-#                     moneda               text, 
-#                     monto_total_lempiras real,
-#                     tipo_factura         text
-#                 )   
-#             ''')
-#             # print("Tabla creada correctamente")
-
-
-
-#             # Borrar facturas del año actual
-#             ano_actual = date.today().year
-#             conn.execute(
-#                 "DELETE FROM tbl_facturas WHERE strftime('%Y', fecha_factura) = ?",
-#                 (str(ano_actual),)
-#             )
-
-#             # Insertar datos
-#             df.to_sql(
-#                  "tbl_facturas",                                # Nombre de tabla
-#                  conn,                                          # Conexion a la base de datos
-#                  if_exists="append",                            # Si existe inserta
-#                  index=False                                    # No incluir el indice del dataframe
-#              )
-
-#             print("Datos insertados correctamente")
-#             print("Proceso de extracción y estructuración de facturas completado exitosamente.")
-#             print("Datos guardados en la base de datos 'facturas.db'.")
-            
-#             conn.commit()    
-   
-#     except Exception as e: 
-#         print(f"Error en la creacion e insercion de datos en SQLITE: {str(e)}")
+        logging.error("❌ Error inesperado: %s", e)
+        return False

@@ -14,3 +14,8 @@ ENV/
 
 # Environment variables
 .env
+
+# Carpetas no tiene que dar seguimiento
+# Ignorar contenido de las carpetas
+logs/**
+

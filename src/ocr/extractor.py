@@ -1,6 +1,11 @@
 import fitz                                              # PyMuPDF
 from src.utils.clean_ocr import limpiar_texto_ocr
 from paddleocr import PaddleOCR
+import logging                                           # Imprime print() en produccion 
+
+
+
+logger = logging.getLogger(__name__)  # ← __name__ toma el nombre del módulo automáticamente
 
 
 """
@@ -35,16 +40,18 @@ class InvoiceOCRExtractor:
     def extraer_texto_pdf(self, rutas: list[str]) -> list[str]:
         
         """Extrae texto de archivos PDF usando PyMuPDF."""
-        resultado = []
 
         # 1. Busca las rutas que contengan archivos pdf 
         rutas_pdf = [r for r in rutas if r.lower().endswith(".pdf")]
 
         # 2. Si no encuentra PDF sale
         if not rutas_pdf:
-            print("No se encontraron archivos PDF para procesar.")
-            return resultado        
+            logger.warning("⚠️ No se encontraron archivos PDF que procesar.")
+            return []         
         
+
+        resultado = []
+
         # 3. Itera sobre cada ruta pdf y extrae su contenido 
         for ruta in rutas_pdf:
             doc  = fitz.open(ruta)                                              # Extrae su contenido
@@ -52,7 +59,7 @@ class InvoiceOCRExtractor:
             resultado.append(text)                                              # Almacena
 
 
-        print('Extracción de PDF finalizó exitosamente')
+        logger.info('✅ Extracción de PDF finalizó exitosamente')
 
         return resultado
 
@@ -66,15 +73,16 @@ class InvoiceOCRExtractor:
         Extrae texto de imágenes con fallback automático a modelo avanzado
         cuando la confianza promedio es menor al umbral definido.
         """
-        resultado = []
         
         # 1. Busca las rutas que contendan archivos imagenes
         rutas_img = [r for r in rutas if r.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
         # 2. Si no encuentra imagenes sale
         if not rutas_img:
-            print("No se encontraron archivos de imagen para procesar.")
-            return resultado
+            logger.warning("⚠️ No se encontraron archivos de imagen que procesar.")
+            return []
+        
+        resultado = []
 
         # 3. Itera sobre cada imagen y extrae su contenido
         for ruta in rutas_img:
@@ -82,7 +90,7 @@ class InvoiceOCRExtractor:
             resultado.append(texto)                      # Almacena
         
 
-        print('Extracción de imagenes finalizó correctamente')
+        logger.info('✅ Extracción de imagenes finalizó correctamente')
 
         return resultado
 
@@ -114,7 +122,7 @@ class InvoiceOCRExtractor:
         promedio = sum(scores) / len(scores) if scores else 0
 
         if promedio < self.UMBRAL_CONFIANZA:
-            print(f"⚠️ Baja confianza ({promedio:.2f}), reprocesando con modelo avanzado: {ruta}")
+           # logger.warning(f"⚠️ Baja confianza ({promedio:.2f}), reprocesando con modelo avanzado: {ruta}")
 
             # Se reprocesa la imagen con el modelo server que es mas avazando  
             results = self._obtener_ocr_avanzado().predict(                   # ← carga aquí si se necesita: Patrón se llama lazy initialization, inicializar solo cuando se necesita.     
@@ -151,7 +159,7 @@ class InvoiceOCRExtractor:
             scores = result.get("rec_scores", [])             # Obtiene la puntuacion del elemento 
 
 
-            # print(f'texts: {texts}, score: {scores}')
+            # logger.warning(f'texts: {texts}, score: {scores}')
 
             for text, score in zip(texts, scores):
 
