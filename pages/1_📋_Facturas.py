@@ -4,7 +4,9 @@ import sqlite3
 from pathlib import Path
 import subprocess
 import sys
+from styles import aplicar_estilos
 
+aplicar_estilos()
 
 # ──────────────────── Configuración de página ────────────────────────
 
@@ -181,26 +183,13 @@ st.markdown("""
         background: #f3e8ff !important;
     }         
 
-
-
+            
     /* Success */
     .stSuccess {
         border-radius: 10px !important;
         border-left: 4px solid #22c55e !important;
     }
              
-
-    /* Ocultar elementos por defecto de streamlit */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-
-    /* Scrollbar bonito */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
-            
 
     /* ──────────────────── RESPONSIVE ──────────────────────── */
 
@@ -347,8 +336,8 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-
-#-- Logica del boton procesar facturas: ejecuta el script de python 
+#------Procesar-----------
+# Logica del boton procesar facturas: ejecuta el script de python 
 
 #  Detectar si se hizo clic
 if st.query_params.get("procesar") == "1":
@@ -441,65 +430,57 @@ with sqlite3.connect(SQLITE_DB) as conn:
     
     
     
-    # ---------------- Métricas ------------------
+# ---------------- Métricas ------------------
 
-    total_facturas  = len(df)
-    ingresos_total  = df.query("tipo_factura == 'Ingresos'")["monto_total_lempiras"].sum() if "monto_total_lempiras" in df.columns else 0
-    gastos_total    = df.query("tipo_factura == 'Gastos'")["monto_total_lempiras"].sum() if "monto_total_lempiras" in df.columns else 0
-    cantidad_gastos    = len(df[df["tipo_factura"] == "Gastos"]) if "tipo_factura" in df.columns else 0
-    cantidad_ingresos  = len(df[df["tipo_factura"] == "Ingresos"]) if "tipo_factura" in df.columns else 0
-
-    metricas = [
-        (str(total_facturas),            "Total Facturas"),
-        (f"L. {ingresos_total:,.0f}",    "Ingresos Total"),
-        (f"L. {gastos_total:,.0f}",      "Gastos Total"),
-        (str(cantidad_gastos),           "Gastos"),
-        (str(cantidad_ingresos),         "Ingresos"),
-    ]
+total_facturas  = len(df)
+ingresos_total  = df.query("tipo_factura == 'Ingresos'")["monto_total_lempiras"].sum() if "monto_total_lempiras" in df.columns else 0
+gastos_total    = df.query("tipo_factura == 'Gastos'")["monto_total_lempiras"].sum() if "monto_total_lempiras" in df.columns else 0
+cantidad_gastos    = len(df[df["tipo_factura"] == "Gastos"]) if "tipo_factura" in df.columns else 0
+cantidad_ingresos  = len(df[df["tipo_factura"] == "Ingresos"]) if "tipo_factura" in df.columns else 0
 
 
-
-    st.markdown(f"""
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">{total_facturas}</div>
-                <div class="metric-label">Total Facturas</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">L. {ingresos_total:,.0f}</div>
-                <div class="metric-label">Ingresos Total</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">L. {gastos_total:,.0f}</div>
-                <div class="metric-label">Gastos Total</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">{cantidad_gastos}</div>
-                <div class="metric-label">Gastos</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">{cantidad_ingresos}</div>
-                <div class="metric-label">Ingresos</div>
-            </div>
+st.markdown(f"""
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-value">{total_facturas}</div>
+            <div class="metric-label">Total Facturas</div>
         </div>
-        """, unsafe_allow_html=True)
+        <div class="metric-card">
+            <div class="metric-value">L. {ingresos_total:,.0f}</div>
+            <div class="metric-label">Ingresos Total</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">L. {gastos_total:,.0f}</div>
+            <div class="metric-label">Gastos Total</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">{cantidad_gastos}</div>
+            <div class="metric-label">Gastos</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value">{cantidad_ingresos}</div>
+            <div class="metric-label">Ingresos</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
 
-     
+    
 
 
-    # ------------------- Tabla editable y filtros ---------------------
+# ------------------- Tabla editable y filtros ---------------------
 
-    st.markdown('<div class="section-title">📋 Facturas Procesadas</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📋 Facturas Procesadas</div>', unsafe_allow_html=True)
 
-    # Convertir fecha_factura a datetime para mostrar el calendario
-    df["fecha_factura"] = pd.to_datetime(df["fecha_factura"], format="%Y-%m-%d %H:%M:%S", errors="coerce")
+# Convertir fecha_factura a datetime para mostrar el calendario
+df["fecha_factura"] = pd.to_datetime(df["fecha_factura"], format="%Y-%m-%d %H:%M:%S", errors="coerce")
 
 
 
-    # --- Filtros de la tabla ---
+# --- Filtros de la tabla ---
+with st.container(border=True):
     _, col_f1, col_f2, col_f3, _ = st.columns([1, 1, 1, 2, 1], gap="small")
 
     with col_f1:
@@ -515,8 +496,8 @@ with sqlite3.connect(SQLITE_DB) as conn:
 
     # --- Aplicar filtros ---
     df_filtrado = df.copy()
-     
-     # Filtro ano
+        
+        # Filtro ano
     if ano_seleccionado != "Todos":
         df_filtrado = df_filtrado[df_filtrado["ano_factura"] == ano_seleccionado]
 
@@ -531,12 +512,10 @@ with sqlite3.connect(SQLITE_DB) as conn:
         ).any(axis=1)
 
         df_filtrado = df_filtrado[mask]
-    
-
-    st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
 
 
 
+with st.container(border=True):
     # ------ Tabla ----------
     df_editado = st.data_editor(
         df_filtrado,
@@ -550,6 +529,7 @@ with sqlite3.connect(SQLITE_DB) as conn:
             "proveedor",
             "rtn_proveedor",
             "nombre_cliente",
+            "rtn_cliente",
             "concepto",
             "monto_total",
             "moneda",
@@ -561,8 +541,9 @@ with sqlite3.connect(SQLITE_DB) as conn:
         column_config={
             "fecha_factura":        st.column_config.DateColumn("Fecha Factura", width="medium"),
             "numero_factura":       st.column_config.TextColumn("N° Factura",    width="medium"),
-            "proveedor":            st.column_config.TextColumn("Proveedor",     width="large"),
             "rtn_proveedor":        st.column_config.TextColumn("RTN Proveedor", width="medium"),
+            "proveedor":            st.column_config.TextColumn("Proveedor",     width="large"),
+            "rtn_cliente":          st.column_config.TextColumn("RTN Cliente",   width="medium"),
             "nombre_cliente":       st.column_config.TextColumn("Cliente",       width="large"),
             "concepto":             st.column_config.TextColumn("Concepto",      width="large"),
             "monto_total":          st.column_config.NumberColumn("Monto",       format="%.2f"),
@@ -573,17 +554,17 @@ with sqlite3.connect(SQLITE_DB) as conn:
         }
     )
 
-    st.markdown('</div>', unsafe_allow_html=True)
 
 
 
-    # ------- Botón guardar -----------
-    _, col_btn, _ = st.columns([2, 1, 2])
-    
-    with col_btn:
-        if st.button("💾 Guardar cambios"):
-            abrir_modal(df_editado)            # Abre la modal
-             
+
+# ------- Botón guardar -----------
+_, col_btn, _ = st.columns([2, 1, 2])
+
+with col_btn:
+    if st.button("💾 Guardar cambios"):
+        abrir_modal(df_editado)            # Abre la modal
+            
     
 # ------ Mensaje de éxito ----------
 if st.session_state.get("guardado_exitoso", False):

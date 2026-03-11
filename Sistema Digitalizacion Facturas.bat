@@ -22,18 +22,21 @@ if errorlevel 1 (
     echo Python ya esta instalado.
 )
 
-:: ── Verificar ODBC SQLite ────────────────────────────────────
-echo Verificando SQLite ODBC Driver...
-reg query "HKLM\SOFTWARE\ODBC\ODBCINST.INI\SQLite3 ODBC Driver" >nul 2>&1
-if errorlevel 1 (
-    echo SQLite ODBC Driver no encontrado. Descargando e instalando...
-    curl -o "%TEMP%\sqliteodbc.exe" http://www.ch-werner.de/sqliteodbc/sqliteodbc_w64.exe
-    "%TEMP%\sqliteodbc.exe" /S
-    del "%TEMP%\sqliteodbc.exe"
-    echo SQLite ODBC Driver instalado correctamente.
-) else (
-    echo SQLite ODBC Driver ya esta instalado.
-)
+
+:: ── Verificar ODBC SQLite para usarlo con Power bi (Opcional) ────────────────────────────────────
+::
+:: echo Verificando SQLite ODBC Driver...
+:: reg query "HKLM\SOFTWARE\ODBC\ODBCINST.INI\SQLite3 ODBC Driver" >nul 2>&1
+:: if errorlevel 1 (
+::    echo SQLite ODBC Driver no encontrado. Descargando e instalando...
+::    curl -o "%TEMP%\sqliteodbc.exe" http://www.ch-werner.de/sqliteodbc/sqliteodbc_w64.exe
+::    "%TEMP%\sqliteodbc.exe" /S
+::    del "%TEMP%\sqliteodbc.exe"
+::    echo SQLite ODBC Driver instalado correctamente.
+:: ) else (
+::    echo SQLite ODBC Driver ya esta instalado.
+:: )
+
 
 :: ── Crear entorno virtual ────────────────────────────────────
 echo Creando entorno virtual...
@@ -60,7 +63,7 @@ echo ====================================
 echo Iniciando sistema...
 call .venv\Scripts\activate
 start "" http://localhost:8501
-streamlit run pages\app.py
+streamlit run Inicio.py --server.headless true
 
 pause
 ```
@@ -68,10 +71,10 @@ pause
 Lo que hace este script:
 ```
 Primera ejecución:
-  → Verifica Python    → instala si no existe
-  → Verifica ODBC      → instala si no existe  
-  → Crea .venv         → solo si no existe
-  → Instala librerías  → desde requirements.txt
+  → Verifica Python               → instala si no existe
+  → Verifica ODBC (opcional)      → instala si no existe  
+  → Crea .venv                    → solo si no existe
+  → Instala librerías             → desde requirements.txt
   → Crea archivo .installed como bandera
   → Inicia la app
 
