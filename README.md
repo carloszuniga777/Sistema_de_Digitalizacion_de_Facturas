@@ -76,10 +76,60 @@ facturas/
 
 1. El usuario coloca las facturas (imágenes o PDFs) en la carpeta `facturas/`
 2. Desde la interfaz web, presiona **"Procesar Facturas"**
+<br>
+
+![Procesar Facturas](assets/1.%20Procesar%20Facturas.gif)
+
+<br>
+
 3. El sistema extrae y estructura la información automáticamente
 4. El usuario revisa y corrige los datos en la tabla editable
+<br>
+
+![Editar Facturas](assets/2.%20Editar%20Facturas%20Procesadas.gif)
+
+<br>
 5. Guarda los cambios en la base de datos
-6. Visualiza el resumen en el Dashboard o en Power BI
+6. Visualiza el resumen en el Dashboard
+
+El sistema cuenta con dos dashboards integrados en la interfaz web:
+
+**Dashboard de Gastos:** muestra el total gastado durante el año mediante una gráfica de barras con desglose mensual, acompañada de gráficos de pastel con los principales proveedores y las categorías con mayor gasto.
+
+<br>
+
+![Dashboard de Gastos](assets/3.%20Dashboard%20de%20Gastos%20en%20Python.gif)
+
+<br>
+
+**Dashboard de Ingresos:** muestra los ingresos anuales con desglose mensual y un gráfico de pastel con los principales clientes..
+
+<br>
+
+![Dashboard de Ingresos](assets/4.%20Dashboard%20de%20Ingresos%20en%20Python.gif)
+
+<br>
+
+7. Descarga de las facturas en un archivo de excel
+<br>
+
+![Descarga de excel](assets/5.%20Descarga%20Excel.gif)
+
+<br>
+
+8. Como alternativa de visualización, el sistema también incluye un Dashboard en Power BI con los mismos indicadores, desarrollado con fines didácticos.
+
+<br>
+
+![Dashboard de gastos en power bi](assets/6.%20Power%20bi%20gastos.png)
+
+<br>
+
+<br>
+
+![Dashboard de ingresos en power bi](assets/7.%20Power%20bi%20ingresos.png)
+
+<br>
 
 ---
 
@@ -288,6 +338,7 @@ Sistema_Digitalización_Facturas/
 │
 ├── facturas/                   # Carpeta donde se colocan las facturas a procesar
 ├── logs/                       # Registros de ejecución del sistema
+├── assets/                     # archivos del README    
 ├── pages/
 │   ├── 1_🧾_Facturas.py        # Pantalla de procesamiento y edición
 │   └── 2_📊_Dashboard.py       # Pantalla de análisis y descarga
@@ -333,7 +384,7 @@ Si prefieres instalar manualmente sin usar el `.bat`:
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/Sistema_Digitalizacion_Facturas.git
+git clone https://github.com/carloszuniga777/Sistema_de_Digitalizacion_de_Facturas_para_Analisis_de_Ingresos_y_Gastos.git
 cd Sistema_Digitalizacion_Facturas
 
 # 2. Crear entorno virtual
