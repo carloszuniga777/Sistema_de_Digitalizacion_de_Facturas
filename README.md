@@ -408,7 +408,42 @@ streamlit run Inicio.py
 ```
 
 ---
+## Oportunidades de Mejora
 
+El proyecto está diseñado para ejecutarse localmente en la máquina del cliente, 
+lo cual simplifica la infraestructura y elimina costos de servidor. Sin embargo, 
+existen oportunidades para evolucionar el sistema hacia una solución 100% web 
+con autenticación multiusuario. A continuación se detallan los cambios que 
+implicaría esa transición:
+
+**OCR en la nube**
+PaddleOCR es uno de los mejores motores OCR disponibles, sin embargo sus modelos 
+son locales y relativamente pesados, lo que encarece su despliegue en la nube.
+Una alternativa sería delegar tanto la extracción de texto como la estructuración 
+de datos completamente a Gemini, que ya forma parte del sistema actual, simplificando 
+el pipeline en un solo paso. Sin embargo, aunque el plan pro de Gemini amplía 
+considerablemente los límites de procesamiento, el procesamiento masivo de imágenes 
+de facturas en un entorno multiusuario podría alcanzar esos límites y generar costos 
+elevados. En ese caso, una opción sería evaluar soluciones diseñadas específicamente 
+para el procesamiento masivo de documentos en la nube como **Amazon Textract** o 
+**Azure AI Document Intelligence**, ambas capaces de realizar la extracción y 
+estructuración de facturas en un solo paso sin necesidad de un modelo adicional.
+
+**Base de datos**
+SQLite debería reemplazarse por PostgreSQL alojado en un servidor cloud 
+(Railway, Supabase, AWS RDS). Este cambio implica agregar una capa de API 
+(por ejemplo FastAPI) para la comunicación entre el frontend y la base de datos. 
+La lógica actual de guardado directo con `to_sql()` pasaría a ser una llamada 
+a un endpoint de la API que recibe los datos editados y los persiste en PostgreSQL.
+
+**Frontend**
+Streamlit es ideal para prototipos y herramientas internas, pero tiene limitaciones 
+para aplicaciones web con múltiples usuarios, autenticación y lógica compleja de 
+permisos. Una evolución natural sería migrar el frontend a React, manteniendo 
+FastAPI como backend, lo que permitiría mayor control sobre la experiencia de 
+usuario y escalabilidad.
+
+---
 
 
 ## 📄 Licencia
