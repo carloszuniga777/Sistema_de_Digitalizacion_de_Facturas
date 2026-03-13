@@ -21,6 +21,13 @@ logs/**
 src/cache/**
 
 
+# Ignorar todo dentro de facturas excepto .gitkeep
+facturas/**
+!facturas/
+!facturas/.gitkeep
+!facturas/*/
+!facturas/*/.gitkeep
+
 README.html
 
 .installed
