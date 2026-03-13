@@ -49,6 +49,31 @@ Gracias a este sistema, el proceso de digitalización de facturas pasó de ser u
 | **Power BI** | Dashboard analítico avanzado conectado a la base de datos |
 
 
+
+---
+
+## Arquitectura ETL
+
+El sistema sigue un pipeline ETL (Extract, Transform, Load) compuesto por tres etapas:
+
+### Extract — Extracción
+- Lee imágenes (JPG, PNG) y documentos PDF desde la carpeta `facturas/`
+- Extrae el texto de cada documento mediante **PaddleOCR** (PP-OCRv5)
+- En paralelo, consulta dos APIs externas para obtener las tasas de cambio vigentes:
+  - **Banco Central de Honduras (BCH)** → tasa USD/HNL
+  - **European Central Bank (ECB)** → tasa EUR/USD
+
+### Transform — Transformación
+- El texto extraído es procesado por **Google Gemini**, que interpreta y estructura
+  la información en campos definidos: proveedor, RTN, fecha, monto, moneda, categoría, entre otros
+- Los montos en dólares y euros se convierten a lempiras aplicando las tasas obtenidas en tiempo real
+- Los datos se limpian, validan y normalizan en un DataFrame de pandas
+
+### Load — Carga
+- El DataFrame estructurado se persiste en una base de datos **SQLite**
+- Los datos quedan disponibles para su revisión en la interfaz web de **Streamlit**
+  y para su análisis en **Power BI** mediante conexión ODBC
+
 ---
 
 ## ⚙️ Funcionamiento
@@ -346,6 +371,9 @@ Sistema_Digitalización_Facturas/
 │    ├── media                   # imagenes
 │    └── Dashboard.pbix          # Archivo de Power BI
 ├── src/
+│   ├── cache/                  # Archivos temporales relacionados con la tasa de conversion                   
+│   ├── api/                        
+│   │   └── tasa_cambio_api.py  # API de tasa de cambio del banco central de honduras y de European Central Bank          
 │   ├── database/
 │   │   ├── facturas.db         # Base de datos SQLite
 │   │   └── repository.py       # Interacción con la base de datos

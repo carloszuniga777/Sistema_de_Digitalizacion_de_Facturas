@@ -1,10 +1,10 @@
 import pandas as pd
 from io import StringIO
-import logging                   # Imprime print() en produccion 
-from src.utils.tasa_cambio_dolar_api import obtener_tasa_cambio_dolar
+import logging                                                                                              # Imprime print() en produccion 
+from api.tasa_cambio import obtener_tasa_cambio_dolar, obtener_tasa_cambio_euro
 
 
-logger = logging.getLogger(__name__)  # ← __name__ toma el nombre del módulo automáticamente
+logger = logging.getLogger(__name__)                                                                            # Configuracion inicial logger
 
 
 
@@ -61,20 +61,24 @@ def csv_a_dataframe(list_csv: list[str])-> pd.DataFrame | None:
 
     
     try:
-        # Convertir las monedas a lempiras
-        # Ultima actualizacion montos: 28-febrero-2026
-
+   
+        # Tasas de conversiones
         tasa_cambio_dolares = obtener_tasa_cambio_dolar()
+        tasa_cambio_euros = obtener_tasa_cambio_euro()
 
         if tasa_cambio_dolares is None:
-            logger.error("❌ No se pudo obtener la tasa de cambio del BCH")
+            logger.error("❌ No se pudo obtener la tasa de cambio de dolares en BCH")
+            return None
+        
+        if tasa_cambio_euros is None:
+            logger.error("❌ No se pudo obtener la tasa de cambio eurps en ECB")
             return None
 
         
         df['monto_total_lempiras'] = 0.0           # inicializar
-        df.loc[df["moneda"] == "dolares", "monto_total_lempiras"] = df.loc[df["moneda"] == "dolares", "monto_total"] * tasa_cambio_dolares
-        df.loc[df["moneda"] == "euros", "monto_total_lempiras"] = df.loc[df["moneda"] == "euros", "monto_total"] * 29.6864
-        df.loc[df["moneda"] == "lempiras", "monto_total_lempiras"] = df.loc[df["moneda"] == "lempiras", "monto_total"]
+        df.loc[df["moneda"] == "dolares", "monto_total_lempiras"] = df.loc[df["moneda"] == "dolares", "monto_total"] * tasa_cambio_dolares                        # Convirtiendo dolares a lempiras
+        df.loc[df["moneda"] == "euros", "monto_total_lempiras"] = df.loc[df["moneda"] == "euros", "monto_total"] * tasa_cambio_euros * tasa_cambio_dolares        # Convirtiendo euros a dolares y luego a lempiras
+        df.loc[df["moneda"] == "lempiras", "monto_total_lempiras"] = df.loc[df["moneda"] == "lempiras", "monto_total"]                                            # Lempiras a Lempiras  
         
         df["fecha_carga"] = pd.Timestamp.now()
 
