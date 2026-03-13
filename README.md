@@ -1,4 +1,6 @@
-# 🧾 Sistema de Digitalización de Facturas
+# 🧾 Sistema de Digitalización de Facturas para Análisis de Ingresos y Gastos
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) ![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white) ![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black) ![Google Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white) ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white) ![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white) ![Versión](https://img.shields.io/badge/Versión-1.0.0-brightgreen?style=for-the-badge) ![Licencia](https://img.shields.io/badge/Licencia-Apache_2.0-blue?style=for-the-badge)
 
 > Sistema automatizado para la extracción, estructuración y análisis de facturas mediante OCR e Inteligencia Artificial.
 
@@ -101,6 +103,7 @@ facturas/
 
 1. El usuario coloca las facturas (imágenes o PDFs) en la carpeta `facturas/`
 2. Desde la interfaz web, presiona **"Procesar Facturas"**
+
 <br>
 
 ![Procesar Facturas](assets/1.%20Procesar%20Facturas.gif)
@@ -109,11 +112,13 @@ facturas/
 
 3. El sistema extrae y estructura la información automáticamente
 4. El usuario revisa y corrige los datos en la tabla editable
+
 <br>
 
 ![Editar Facturas](assets/2.%20Editar%20Facturas%20Procesadas.gif)
 
 <br>
+
 5. Guarda los cambios en la base de datos
 6. Visualiza el resumen en el Dashboard
 
@@ -136,6 +141,7 @@ El sistema cuenta con dos dashboards integrados en la interfaz web:
 <br>
 
 7. Descarga de las facturas en un archivo de excel
+
 <br>
 
 ![Descarga de excel](assets/5.%20Descarga%20Excel.gif)
@@ -164,9 +170,12 @@ El sistema cuenta con dos dashboards integrados en la interfaz web:
 
 1. Descarga o clona este repositorio: 
 `https://github.com/carloszuniga777/Sistema_de_Digitalizacion_de_Facturas_para_Analisis_de_Ingresos_y_Gastos.git`
-2. Ejecuta el archivo **`Sistema Digitalizacion Facturas.bat`** haciendo doble clic
-3. El script instalará automáticamente Python y las dependencias necesarias.
-4. Al finalizar, se abrirá el navegador con el sistema listo para usar
+2. Configurar `variables de entorno`: modifica el archivo **.env_template**: Del nombre del archivo borra `_template` para que quede como `.env`:
+   agrega la APY KEY de las APIs correspondientes y agregue su **nombre** y su **rtn** como aparen en sus facturas. 
+   **Nota**: Tiene que crear una cuenta en las plataformas para poder obtener las API Key 
+3. Ejecuta el archivo **`Sistema Digitalizacion Facturas.bat`** haciendo doble clic
+4. El script instalará automáticamente Python y las dependencias necesarias.
+5. Al finalizar, se abrirá el navegador con el sistema listo para usar
 
 > ⚠️ Se requiere conexión a internet en la primera ejecución para descargar Python y las dependencias.
 
@@ -424,12 +433,8 @@ pip install -r requirements.txt
 
 # 4. Configurar variables de entorno
 # Modifica el archivo .env_template: Del nombre del archivo borra _template para que quede como .env 
-# Agrega tu API Key de Gemini:
-
-#     GEMINI_API_KEY=tu_api_key_aqui
-#     RTN_PRINCIPAL = "Tu_RTN_aqui"
-#     NOMBRE_PRINCIPAL = "Tu_Nombre_aqui" 
-
+# agrega la APY KEY de las APIs correspondientes, agregue su su nombre y rtn como aparece en las facturas. 
+# Nota: Tiene que crear una cuenta en las plataformas para poder obtener las API Key 
 
 # 5. Ejecutar la aplicación
 streamlit run Inicio.py
